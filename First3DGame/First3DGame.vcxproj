@@ -105,18 +105,21 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\vclib\SDL2-2.32.10\include;C:\vclib\SDL2_image-2.8.8\include;C:\vclib\glew-2.2.0\include\GL;C:\vclib\soil-master\include\SOIL;C:\vclib\SDL2_ttf-2.24.0\include;C:\vclib\rapidjson-1.1.0\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\vclib\SDL2-2.32.10\include;C:\vclib\SDL2_image-2.8.8\include;C:\vclib\glew-2.2.0\include\GL;C:\vclib\soil-master\include\SOIL;C:\vclib\SDL2_ttf-2.24.0\include;C:\vclib\rapidjson-1.1.0\include;C:\Program Files (x86)\FMOD SoundSystem\FMOD Studio API Windows\api\studio\inc;C:\Program Files (x86)\FMOD SoundSystem\FMOD Studio API Windows\api\lowlevel\inc;C:\Program Files (x86)\FMOD SoundSystem\FMOD Studio API Windows\api\fsbank\inc</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\vclib\SDL2-2.32.10\lib\x64;C:\vclib\SDL2_image-2.8.8\lib\x64;C:\vclib\glew-2.2.0\lib\Release\x64;C:\vclib\SDL2_ttf-2.24.0\lib\x64</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;glew32.lib;opengl32.lib;SDL2_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\vclib\SDL2-2.32.10\lib\x64;C:\vclib\SDL2_image-2.8.8\lib\x64;C:\vclib\glew-2.2.0\lib\Release\x64;C:\vclib\SDL2_ttf-2.24.0\lib\x64;C:\Program Files (x86)\FMOD SoundSystem\FMOD Studio API Windows\api\studio\lib;C:\Program Files (x86)\FMOD SoundSystem\FMOD Studio API Windows\api\lowlevel\lib;C:\Program Files (x86)\FMOD SoundSystem\FMOD Studio API Windows\api\fsbank\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;glew32.lib;opengl32.lib;SDL2_ttf.lib;fmodstudioL_vc.lib;fmodL_vc.lib;fsbank_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy /y /d "C:\vclib\glew-2.2.0\bin\Release\x64\glew32.dll" "$(OutDir)"
 xcopy /y /d "C:\vclib\SDL2-2.32.10\lib\x64\SDL2.dll" "$(OutDir)"
-xcopy /y /d "C:\vclib\SDL2_ttf-2.24.0\lib\x64\SDL2_ttf.dll" "$(OutDir)"</Command>
+xcopy /y /d "C:\vclib\SDL2_ttf-2.24.0\lib\x64\SDL2_ttf.dll" "$(OutDir)"
+xcopy /y /d "C:\Program Files (x86)\FMOD SoundSystem\FMOD Studio API Windows\api\studio\lib\fmodstudioL.dll" "$(OutDir)"
+xcopy /y /d "C:\Program Files (x86)\FMOD SoundSystem\FMOD Studio API Windows\api\lowlevel\lib\fmodL.dll" "$(OutDir)"
+xcopy /y /d "C:\Program Files (x86)\FMOD SoundSystem\FMOD Studio API Windows\api\fsbank\lib\fsbank.dll" "$(OutDir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -136,6 +139,7 @@ xcopy /y /d "C:\vclib\SDL2_ttf-2.24.0\lib\x64\SDL2_ttf.dll" "$(OutDir)"</Command
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Actor.cpp" />
+    <ClCompile Include="AudioSystem.cpp" />
     <ClCompile Include="CameraActor.cpp" />
     <ClCompile Include="CircleComponent.cpp" />
     <ClCompile Include="Component.cpp" />
@@ -157,6 +161,7 @@ xcopy /y /d "C:\vclib\SDL2_ttf-2.24.0\lib\x64\SDL2_ttf.dll" "$(OutDir)"</Command
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Actor.h" />
+    <ClInclude Include="AudioSystem.h" />
     <ClInclude Include="CameraActor.h" />
     <ClInclude Include="CircleComponent.h" />
     <ClInclude Include="Component.h" />

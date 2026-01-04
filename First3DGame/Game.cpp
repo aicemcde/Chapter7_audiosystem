@@ -12,6 +12,7 @@
 #include "Mesh.h"
 #include "PlaneActor.h"
 #include "SpriteComponent.h"
+#include "AudioSystem.h"
 
 
 Game* Game::sInstance = nullptr;
@@ -45,11 +46,8 @@ bool Game::Initialize()
 	mScene = std::make_unique<Scene>();
 	mResourceManager = std::make_unique<ResourceManager>(this);
 	mRenderer = std::make_unique<Renderer>(this);
-	if (!mRenderer->Initialize())
-	{
-		SDL_Log("Renderer could not initialize!");
-		return false;
-	}
+
+	mAudioSystem = std::make_unique<AudioSystem>(this);
 
 	LoadData();
 
@@ -59,6 +57,7 @@ bool Game::Initialize()
 void Game::Shutdown()
 {
 	UnloadData();
+	mAudioSystem->Shutdown();
 	SDL_Quit();
 }
 
@@ -211,6 +210,7 @@ void Game::LoadData()
 void Game::UnloadData()
 {
 	mRenderer->UnloadData();
+	mScene->Unload();
 }
 
 void Game::ColorfulBG(float deltaTime)

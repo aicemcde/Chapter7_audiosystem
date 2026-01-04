@@ -40,6 +40,7 @@ private:
 	std::unique_ptr<class Scene> mScene;
 	std::unique_ptr<class ResourceManager> mResourceManager;
 	std::unique_ptr<class Renderer> mRenderer;
+	std::unique_ptr<class AudioSystem> mAudioSystem;
 
 	class CameraActor* mCameraActor;
 

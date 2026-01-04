@@ -12,7 +12,7 @@
 Renderer::Renderer(Game* game)
 	:mGame(game)
 {
-
+	Initialize();
 }
 
 Renderer::~Renderer()
