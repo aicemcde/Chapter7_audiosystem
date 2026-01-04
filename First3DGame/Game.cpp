@@ -112,6 +112,7 @@ void Game::UpdateGame()
 		deltaTime = 0.05f;
 	}
 	mScene->Update(deltaTime);
+	mAudioSystem->Update(deltaTime);
 	//ColorfulBG(deltaTime);
 }
 
