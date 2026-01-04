@@ -1,0 +1,8 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/ソリューション項目/" />
+  <Project Path="First3DGame/First3DGame.vcxproj" Id="5fdab51e-f12c-49d9-8f6e-8a1a77ccc211" />
+</Solution>
