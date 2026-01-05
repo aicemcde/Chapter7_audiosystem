@@ -1,6 +1,7 @@
 #pragma once
 #include <unordered_map>
 #include <string>
+#include "SoundEvent.hpp"
 
 namespace FMOD
 {
@@ -29,6 +30,7 @@ public:
 	class SoundEvent PlayEvent(const std::string& name);
 protected:
 	FMOD::Studio::EventInstance* GetEventInstance(unsigned int id);
+	friend class SoundEvent;
 private:
 	static unsigned int sNextID;
 	class Game* mGame;
