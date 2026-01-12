@@ -4,13 +4,15 @@
 #include <fmod_errors.h>
 
 const int MAX_PATH_LENGTH = 512;
+const float DIRECT_OCCLUSION = 1.0;
+const float REVERB_OCCLUSION = 1.0;
 
 unsigned int AudioSystem::sNextID = 0;
 
 AudioSystem::AudioSystem(Game* game)
 	:mGame(game)
 {
-	Initialize();
+	
 }
 
 AudioSystem::~AudioSystem()
@@ -36,11 +38,20 @@ bool AudioSystem::Initialize()
 	result = mSystem->initialize(
 		512,
 		FMOD_STUDIO_INIT_NORMAL,
-		FMOD_INIT_NORMAL,
+		FMOD_INIT_CHANNEL_LOWPASS,
 		nullptr
 	);
 
 	mSystem->getLowLevelSystem(&mLowLevelSystem);
+
+	float dopplerScale = 1.0f;
+	float distanceFactor = 50.0f;
+	float rolloffScale = 1.0f;
+	mLowLevelSystem->get3DSettings(
+		&dopplerScale,
+		&distanceFactor,
+		&rolloffScale
+	);
 
 	LoadBank("Assets/Master Bank.strings.bank");
 	LoadBank("Assets/Master Bank.bank");
@@ -50,7 +61,11 @@ bool AudioSystem::Initialize()
 
 void AudioSystem::Shutdown()
 {
-	mSystem->release();
+	UnloadAllBank();
+	if (mSystem)
+	{
+		mSystem->release();
+	}
 }
 
 void AudioSystem::Update(float deltaTime)
@@ -106,6 +121,8 @@ void AudioSystem::LoadBank(const std::string& name)
 				mEvents.emplace(eventName, e);
 			}
 		}
+
+		LoadBus(bank);
 	}
 }
 
@@ -135,7 +152,9 @@ void AudioSystem::UnloadBank(const std::string& name)
 				mEvents.erase(event_iter);
 			}
 		}
+
 	}
+	UnloadBus(bank);
 	bank->unloadSampleData();
 	bank->unload();
 	mBanks.erase(iter);
@@ -167,6 +186,11 @@ SoundEvent AudioSystem::PlayEvent(const std::string& name)
 			retID = sNextID;
 			mEventInstance.emplace(retID, event);
 		}
+
+		mSystem->flushCommands();
+		FMOD::ChannelGroup* cg = nullptr;
+		event->getChannelGroup(&cg);
+		cg->set3DOcclusion(DIRECT_OCCLUSION, REVERB_OCCLUSION);
 	}
 	return SoundEvent();
 }
@@ -180,4 +204,116 @@ FMOD::Studio::EventInstance* AudioSystem::GetEventInstance(unsigned int id)
 		event = iter->second;
 	}
 	return event;
+}
+
+namespace
+{
+	FMOD_VECTOR VecToFMOD(const Vector3& in)
+	{
+		FMOD_VECTOR v;
+		v.x = in.y;
+		v.y = in.z;
+		v.z = in.x;
+		return v;
+	}
+}
+
+void AudioSystem::SetListener(const Matrix4& viewMatrix)
+{
+	Matrix4 inView = viewMatrix;
+	inView.Invert();
+	FMOD_3D_ATTRIBUTES listener;
+	listener.position = VecToFMOD(inView.GetTranslation());
+	listener.forward = VecToFMOD(inView.GetZAxis());
+	listener.up = VecToFMOD(inView.GetYAxis());
+	listener.velocity = { 0.0f, 0.0f, 0.0f };
+	mSystem->setListenerAttributes(0, &listener);
+}
+
+void AudioSystem::LoadBus(FMOD::Studio::Bank* bank)
+{
+	int numBuses = 0;
+	bank->getBusCount(&numBuses);
+	if (numBuses > 0)
+	{
+		std::vector<FMOD::Studio::Bus*> buses(numBuses);
+		bank->getBusList(buses.data(), numBuses, &numBuses);
+		char busName[512];
+		for (int i = 0; i < numBuses; ++i)
+		{
+			FMOD::Studio::Bus* bus = buses[i];
+			bus->getPath(busName, 512, nullptr);
+			mBuses.emplace(busName, bus);
+		}
+	}
+}
+
+void AudioSystem::UnloadBus(FMOD::Studio::Bank* bank)
+{
+	int numBuses = 0;
+	bank->getBusCount(&numBuses);
+	if (numBuses > 0)
+	{
+		std::vector<FMOD::Studio::Bus*> buses(numBuses);
+		bank->getBusList(buses.data(), numBuses, &numBuses);
+		char busName[512];
+		for (int i = 0; i < numBuses; ++i)
+		{
+			FMOD::Studio::Bus* bus = buses[i];
+			bus->getPath(busName, 512, nullptr);
+			auto bus_iter = mBuses.find(busName);
+			if (bus_iter != mBuses.end())
+			{
+				mBuses.erase(bus_iter);
+			}
+		}
+	}
+}
+
+float AudioSystem::GetBusVolume(const std::string& name) const
+{
+	auto iter = mBuses.find(name);
+	FMOD::Studio::Bus* bus = nullptr;
+	float volume = 0.0f;
+	if (iter != mBuses.end())
+	{
+		bus = iter->second;
+		bus->getVolume(&volume);
+	}
+	return volume;
+}
+
+bool AudioSystem::GetBusPaused(const std::string& name) const
+{
+	FMOD::Studio::Bus* bus = nullptr;
+	auto iter = mBuses.find(name);
+	bool pause = false;
+	if (iter != mBuses.end())
+	{
+		bus = iter->second;
+		bus->getPaused(&pause);
+	}
+	return pause;
+}
+
+void AudioSystem::SetBusVolume(const std::string& name, float volume)
+{
+	FMOD::Studio::Bus* bus = nullptr;
+	auto iter = mBuses.find(name);
+	if (iter != mBuses.end())
+	{
+		bus = iter->second;
+		bus->setVolume(volume);
+	}
+}
+
+void AudioSystem::SetBusPaused(const std::string& name, bool pause)
+{
+	FMOD::Studio::Bus* bus = nullptr;
+	auto iter = mBuses.find(name);
+	if (iter != mBuses.end())
+	{
+		bus = iter->second;
+		bus->setPaused(pause);
+	}
 }
