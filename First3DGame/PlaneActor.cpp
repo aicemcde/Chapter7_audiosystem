@@ -8,7 +8,6 @@ PlaneActor::PlaneActor(class Game* game)
 	:Actor(game)
 {
 	SetScale(10.0f);
-	std::unique_ptr<MeshComponent> mc = std::make_unique<MeshComponent>(this);
+	MeshComponent* mc = AddComponent_Pointer<MeshComponent>(this);
 	mc->SetMesh(mGame->GetResourceInstance()->GetMesh("Assets/Plane.gpmesh"));
-	AddComponent(std::move(mc));
 }

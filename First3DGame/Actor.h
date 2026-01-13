@@ -3,6 +3,9 @@
 #include "Math.h"
 #include <vector>
 #include <memory>
+#include <concepts>
+#include <algorithm>
+#include "Component.h"
 
 class Actor
 {
@@ -15,8 +18,30 @@ public:
 		EDead
 	};
 
+	template<typename T, typename... Args>
+	requires std::derived_from<T, class Component>
+	void AddComponent(Args&&... args)
+	{
+		auto newComponent = std::make_unique<T>(std::forward<Args>(args)...);
+		int myOrder = newComponent->GetUpdateOrder();
+		auto iter = std::ranges::lower_bound(mComponents, myOrder, {}, &Component::GetUpdateOrder);
+		mComponents.insert(iter, std::move(newComponent));
+	}
+
+	template<typename T,typename... Args>
+	requires std::derived_from<T, class Component>
+	T* AddComponent_Pointer(Args&&... args)
+	{
+		auto newComponent = std::make_unique<T>(std::forward<Args>(args)...);
+		T* ptr = newComponent.get();
+		int myOrder = newComponent->GetUpdateOrder();
+		auto iter = std::ranges::lower_bound(mComponents, myOrder, {}, &Component::GetUpdateOrder);
+		mComponents.insert(iter, std::move(newComponent));
+		return ptr;
+	}
+	
 	explicit Actor(class Game* game);
-	virtual ~Actor();
+	virtual ~Actor()=default;
 
 	void Update(float deltaTime);
 	void UpdateComponents(float deltaTime);
@@ -40,7 +65,6 @@ public:
 
 	Vector3 GetForward() const { return Vector3::Transform(Vector3::UnitX, mRotation); }
 
-	void AddComponent(std::unique_ptr<class Component> component);
 	void RemoveComponent(class Component* component);
 protected:
 	class Game* mGame;

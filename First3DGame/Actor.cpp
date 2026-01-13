@@ -1,6 +1,5 @@
 #include "Actor.h"
-#include "Component.h"
-#include <algorithm>
+
 
 Actor::Actor(class Game* game)
 	:mGame(game)
@@ -9,11 +8,6 @@ Actor::Actor(class Game* game)
 	,mPosition(Vector3::Zero)
 	,mRotation()
 	,mState(EActive)
-{
-
-}
-
-Actor::~Actor()
 {
 
 }
@@ -59,13 +53,6 @@ void Actor::ActorInput(const uint8_t* keyState)
 
 }
 
-void Actor::AddComponent(std::unique_ptr<Component> component)
-{
-	int myOrder = component->GetUpdateOrder();
-	auto iter = std::ranges::lower_bound(mComponents, myOrder, {}, &Component::GetUpdateOrder);
-	mComponents.insert(iter, std::move(component));
-}
-
 void Actor::RemoveComponent(Component* component)
 {
 	auto iter = std::find_if(mComponents.begin(), mComponents.end(),
@@ -87,5 +74,10 @@ void Actor::ComputeWorldTransform()
 		mWorldTransform = Matrix4::CreateScale(mScale);
 		mWorldTransform *= Matrix4::CreateFromQuaternion(mRotation);
 		mWorldTransform *= Matrix4::CreateTranslation(mPosition);
+
+		for (const auto& comp : mComponents)
+		{
+			comp->OnUpdateWorldTransform();
+		}
 	}
 }

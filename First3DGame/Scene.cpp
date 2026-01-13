@@ -3,8 +3,9 @@
 #include <algorithm>
 #include "SpriteComponent.h"
 
-Scene::Scene()
+Scene::Scene(Game* game)
 	:mUpdatingActors(false)
+	, mGame(game)
 {
 
 }

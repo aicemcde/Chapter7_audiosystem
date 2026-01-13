@@ -4,6 +4,7 @@
 #include <glew.h>
 #include <memory>
 #include <vector>
+#include "SoundEvent.h"
 
 class Game
 {
@@ -18,6 +19,7 @@ public:
 	static class Scene* GetSceneInstance() { return sInstance->mScene.get(); }
 	static class ResourceManager* GetResourceInstance() { return sInstance->mResourceManager.get(); }
 	static class Renderer* GetRendererInstance() { return sInstance->mRenderer.get(); }
+	static class AudioSystem* GetAudioSystemInstance() { return sInstance->mAudioSystem.get(); }
 
 	class Scene* GetScene() const { return mScene.get(); }
 	class ResourceManager* GetResourceManager() const { return mResourceManager.get(); }
@@ -25,6 +27,7 @@ public:
 	void SetGameRunning(bool running) { mIsRunning = running; }
 private:
 	void ProcessInput();
+	void HandleKeyPress(int key);
 	void UpdateGame();
 	void GenerateOutput();
 	void LoadData();
@@ -40,8 +43,11 @@ private:
 	std::unique_ptr<class Scene> mScene;
 	std::unique_ptr<class ResourceManager> mResourceManager;
 	std::unique_ptr<class Renderer> mRenderer;
+	std::unique_ptr<class AudioSystem> mAudioSystem;
 
 	class CameraActor* mCameraActor;
+	SoundEvent mMusicEvent;
+	SoundEvent mReverbSnap;
 
 	Uint32 mTicksCount;
 
