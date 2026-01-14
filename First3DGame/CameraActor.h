@@ -16,4 +16,5 @@ private:
 	class AudioComponent* mAudioComp;
 	class SoundEvent mFootstep;
 	float mLastFootstep;
+	float mFootstepSurface;
 };

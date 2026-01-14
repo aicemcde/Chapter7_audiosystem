@@ -123,16 +123,16 @@ void Game::HandleKeyPress(int key)
 	{
 	case '-':
 	{
-		float volume = mAudioSystem->GetBusVolume("bus/:");
+		float volume = mAudioSystem->GetBusVolume("bus:/");
 		volume = Math::Max(0.0f, volume - 0.1f);
-		mAudioSystem->SetBusVolume("bus/:", volume);
+		mAudioSystem->SetBusVolume("bus:/", volume);
 		break;
 	}
 	case '=':
 	{
-		float volume = mAudioSystem->GetBusVolume("bus/:");
-		volume = Math::Min(0.0f, volume + 0.1f);
-		mAudioSystem->SetBusVolume("bus/:", volume);
+		float volume = mAudioSystem->GetBusVolume("bus:/");
+		volume = Math::Min(1.0f, volume + 0.1f);
+		mAudioSystem->SetBusVolume("bus:/", volume);
 		break;
 	}
 	case 'e':

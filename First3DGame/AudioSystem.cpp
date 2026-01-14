@@ -2,6 +2,7 @@
 #include <fmod_studio.hpp>
 #include "Game.h"
 #include <fmod_errors.h>
+#include "Renderer.h"
 
 const int MAX_PATH_LENGTH = 512;
 const float DIRECT_OCCLUSION = 0.0f;
