@@ -4,22 +4,10 @@
 #include <fmod_errors.h>
 
 const int MAX_PATH_LENGTH = 512;
-const float DIRECT_OCCLUSION = 1.0;
-const float REVERB_OCCLUSION = 1.0;
+const float DIRECT_OCCLUSION = 0.0f;
+const float REVERB_OCCLUSION = 0.2f;
 
 unsigned int AudioSystem::sNextID = 0;
-
-namespace
-{
-	static FMOD_VECTOR VecToFMOD(const Vector3& in)
-	{
-		FMOD_VECTOR v;
-		v.x = in.y;
-		v.y = in.z;
-		v.z = in.x;
-		return v;
-	}
-}
 
 AudioSystem::AudioSystem(Game* game)
 	:mGame(game)
@@ -206,18 +194,9 @@ SoundEvent AudioSystem::PlayEvent(const std::string& name)
 			retID = sNextID;
 			mEventInstance.emplace(retID, event);
 		}
-
-		mSystem->flushCommands();
-		FMOD::ChannelGroup* cg = nullptr;
-		event->getChannelGroup(&cg);
-		cg->set3DOcclusion(DIRECT_OCCLUSION, REVERB_OCCLUSION);
 	}
 
-	if (retID > 0)
-	{
-		return SoundEvent(this, retID);
-	}
-	return SoundEvent();
+	return SoundEvent(this, retID);
 }
 
 FMOD::Studio::EventInstance* AudioSystem::GetEventInstance(unsigned int id)
@@ -229,6 +208,18 @@ FMOD::Studio::EventInstance* AudioSystem::GetEventInstance(unsigned int id)
 		event = iter->second;
 	}
 	return event;
+}
+
+namespace
+{
+	FMOD_VECTOR VecToFMOD(const Vector3& in)
+	{
+		FMOD_VECTOR v;
+		v.x = in.y;
+		v.y = in.z;
+		v.z = in.x;
+		return v;
+	}
 }
 
 void AudioSystem::SetListener(const Matrix4& viewMatrix)
