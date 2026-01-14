@@ -17,4 +17,5 @@ private:
 	class SoundEvent mFootstep;
 	float mLastFootstep;
 	float mFootstepSurface;
+	Vector3 mCameraPos;
 };

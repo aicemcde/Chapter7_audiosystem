@@ -10,6 +10,7 @@ const float REVERB_OCCLUSION = 0.2f;
 const float dopplerScale = 1.0f;
 const float distanceFactor = 50.0f;
 const float rolloffScale = 1.0f;
+const float LISTENER_BLEND_RATIO = 0.2f;
 
 unsigned int AudioSystem::sNextID = 0;
 
@@ -239,22 +240,28 @@ FMOD::Studio::EventInstance* AudioSystem::GetEventInstance(unsigned int id)
 	return event;
 }
 
-void AudioSystem::SetListener(const Matrix4& viewMatrix, float deltaTime)
+void AudioSystem::SetListener(const Matrix4& viewMatrix, const Vector3& playerPos, float deltaTime)
 {
 	Matrix4 inView = viewMatrix;
 	inView.Invert();
+	Vector3 cameraPos = inView.GetTranslation();
+	Vector3 cameraForward = inView.GetZAxis();
+	Vector3 cameraUp = inView.GetYAxis();
 
-	FMOD_3D_ATTRIBUTES listener;
-	listener.position = VecToFMOD(inView.GetTranslation());
-	listener.forward = VecToFMOD(inView.GetZAxis());
-	listener.up = VecToFMOD(inView.GetYAxis());
+	Vector3 virtualPos = LerpVector3(cameraPos, playerPos, LISTENER_BLEND_RATIO);
+
 	if (deltaTime > 0.0f)
 	{
 		Vector3 rawVelocity;
-		rawVelocity = CalVelocity(inView.GetTranslation(), mLastListenerPos, deltaTime);
+		rawVelocity = CalVelocity(virtualPos, mLastListenerPos, deltaTime);
 		mLastListenerVelocity = LerpVector3(mLastListenerVelocity, rawVelocity, 0.1f);
 	}
-	mLastListenerPos = inView.GetTranslation();
+	mLastListenerPos = virtualPos;
+
+	FMOD_3D_ATTRIBUTES listener;
+	listener.position = VecToFMOD(virtualPos);
+	listener.forward = VecToFMOD(cameraForward);
+	listener.up = VecToFMOD(cameraUp);
 	listener.velocity = VecToFMOD(mLastListenerVelocity);
 	mSystem->setListenerAttributes(0, &listener);
 }

@@ -183,7 +183,7 @@ void Game::UpdateGame()
 	}
 
 	mScene->Update(deltaTime);
-	mAudioSystem->SetListener(mRenderer->GetView(), deltaTime);
+	mAudioSystem->SetListener(mRenderer->GetView(), mCameraActor->GetPosition(), deltaTime);
 	mAudioSystem->Update(deltaTime);
 	//ColorfulBG(deltaTime);
 }

@@ -30,7 +30,7 @@ public:
 	void UnloadBank(const std::string& name);
 	void UnloadAllBank();
 	class SoundEvent PlayEvent(const std::string& name);
-	void SetListener(const Matrix4& viewMatrix, float delatTime);
+	void SetListener(const Matrix4& viewMatrix, const Vector3& playerPos, float delatTime);
 
 	float GetBusVolume(const std::string& name) const;
 	bool GetBusPaused(const std::string& name) const;

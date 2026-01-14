@@ -4,6 +4,8 @@
 #include "Renderer.h"
 #include "AudioComponent.h"
 #include "AudioSystem.h"
+#include "MeshComponent.h"
+#include "ResourceManager.h"
 
 CameraActor::CameraActor(Game* game)
 	:Actor(game)
@@ -12,6 +14,8 @@ CameraActor::CameraActor(Game* game)
 {
 	mMoveComp = AddComponent_Pointer<MoveComponent>(this);
 	mAudioComp = AddComponent_Pointer<AudioComponent>(this);
+	MeshComponent* mc = AddComponent_Pointer<MeshComponent>(this);
+	mc->SetMesh(mGame->GetResourceManager()->GetMesh("Assets/Sphere.gpmesh"));
 	mFootstep = mAudioComp->PlayEvent("event:/Footstep");
 	mFootstep.SetPaused(true);
 }
@@ -28,11 +32,11 @@ void CameraActor::UpdateActor(float deltaTime)
 		mLastFootstep = 0.5f;
 	}
 	
-	Vector3 cameraPos = GetPosition();
-	Vector3 target = cameraPos + GetForward() * 100.0f;
+	mCameraPos = GetPosition() - GetForward() * 200.0f + Vector3::UnitZ * 100.0f;
+	Vector3 target = GetPosition() + GetForward() * 100.0f;
 	Vector3 up = Vector3::UnitZ;
 
-	Matrix4 view = Matrix4::CreateLookAt(cameraPos, target, up);
+	Matrix4 view = Matrix4::CreateLookAt(mCameraPos, target, up);
 	Game::GetRendererInstance()->SetViewMatrix(view);
 }
 
