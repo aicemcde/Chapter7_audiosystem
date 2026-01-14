@@ -10,7 +10,7 @@ public:
 	void Restart();
 	void Stop(bool allowFadeOut = true);
 	bool Is3D() const;
-	void Set3DAttributes(const Matrix4& worldTrans);
+	void Set3DAttributes(const Matrix4& worldTrans, const Vector3& velocity);
 	
 	void SetPaused(bool pause);
 	void SetVolume(float value);

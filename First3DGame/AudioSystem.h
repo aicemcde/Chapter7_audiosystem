@@ -30,7 +30,7 @@ public:
 	void UnloadBank(const std::string& name);
 	void UnloadAllBank();
 	class SoundEvent PlayEvent(const std::string& name);
-	void SetListener(const Matrix4& viewMatrix);
+	void SetListener(const Matrix4& viewMatrix, float delatTime);
 
 	float GetBusVolume(const std::string& name) const;
 	bool GetBusPaused(const std::string& name) const;
@@ -45,6 +45,7 @@ private:
 
 	static unsigned int sNextID;
 	class Game* mGame;
+	Vector3 mLastListenerPos;
 	FMOD::Studio::System* mSystem;
 	FMOD::System* mLowLevelSystem;
 	std::unordered_map < std::string, FMOD::Studio::Bank* > mBanks;

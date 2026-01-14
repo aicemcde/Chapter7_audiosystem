@@ -10,11 +10,12 @@ public:
 	~AudioComponent();
 
 	void Update(float deltaTime) override;
-	void OnUpdateWorldTransform() override;
+	void OnUpdateWorldTransform(float deltaTime) override;
 
 	SoundEvent PlayEvent(const std::string& name);
 	void StopAllEvent();
 private:
+	Vector3 mLastPos;
 	std::vector<SoundEvent> mEvent2D;
 	std::vector<SoundEvent> mEvent3D;
 };

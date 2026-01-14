@@ -16,10 +16,10 @@ void Actor::Update(float deltaTime)
 {
 	if (mState == EActive)
 	{
-		ComputeWorldTransform();
+		ComputeWorldTransform(deltaTime);
 		UpdateComponents(deltaTime);
 		UpdateActor(deltaTime);
-		ComputeWorldTransform();
+		ComputeWorldTransform(deltaTime);
 	}
 }
 
@@ -66,7 +66,7 @@ void Actor::RemoveComponent(Component* component)
 	}
 }
 
-void Actor::ComputeWorldTransform()
+void Actor::ComputeWorldTransform(float deltaTime)
 {
 	if (mRecomputeWorldTransform)
 	{
@@ -77,7 +77,7 @@ void Actor::ComputeWorldTransform()
 
 		for (const auto& comp : mComponents)
 		{
-			comp->OnUpdateWorldTransform();
+			comp->OnUpdateWorldTransform(deltaTime);
 		}
 	}
 }

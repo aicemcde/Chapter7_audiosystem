@@ -50,7 +50,7 @@ public:
 	void ProcessInput(const uint8_t* keyState);
 	virtual void ActorInput(const uint8_t* keyState);
 
-	void ComputeWorldTransform();
+	void ComputeWorldTransform(float deltaTime);
 
 	State GetState() const { return mState; }
 	Matrix4 GetWorldTransform() const { return mWorldTransform; }
@@ -69,15 +69,18 @@ public:
 protected:
 	class Game* mGame;
 	State mState;
-	float mScale;
-	Quaternion mRotation;
-	Vector3 mPosition;
 
-	//オブジェクト空間からワールド空間への変換に用いる
+	//ワールド空間での座標
 	Matrix4 mWorldTransform;
 
 	//スケールや回転、座標を変更したら、mWorldTransformをもう一度計算し直す
 	bool mRecomputeWorldTransform;
 
 	std::vector<std::unique_ptr<class Component>> mComponents;
+
+private:
+	//↓オブジェクト空間
+	float mScale;
+	Quaternion mRotation;
+	Vector3 mPosition;
 };

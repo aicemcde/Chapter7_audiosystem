@@ -9,7 +9,7 @@ public:
 
 	virtual void Update(float deltaTime);
 	virtual void ProcessInput(const uint8_t* keyState) {};
-	virtual void OnUpdateWorldTransform() {};
+	virtual void OnUpdateWorldTransform(float deltaTime) {};
 	int GetUpdateOrder() const { return mUpdateOrder; }
 	class Actor* GetOwner() const { return mOwner; }
 protected:

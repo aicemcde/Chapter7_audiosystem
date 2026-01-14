@@ -7,11 +7,36 @@
 const int MAX_PATH_LENGTH = 512;
 const float DIRECT_OCCLUSION = 0.0f;
 const float REVERB_OCCLUSION = 0.2f;
+const float dopplerScale = 1.0f;
+const float distanceFactor = 50.0f;
+const float rolloffScale = 1.0f;
 
 unsigned int AudioSystem::sNextID = 0;
 
+namespace
+{
+	FMOD_VECTOR VecToFMOD(const Vector3& in)
+	{
+		FMOD_VECTOR v;
+		v.x = in.y;
+		v.y = in.z;
+		v.z = in.x;
+		return v;
+	}
+
+	Vector3 CalVelocity(const Vector3& current, const Vector3& last, float deltaTime)
+	{
+		Vector3 result;
+		result.x = (current.x - last.x) / deltaTime;
+		result.y = (current.y - last.y) / deltaTime;
+		result.z = (current.z - last.z) / deltaTime;
+		return result;
+	}
+}
+
 AudioSystem::AudioSystem(Game* game)
 	:mGame(game)
+	,mLastListenerPos(Vector3::Zero)
 {
 	
 }
@@ -45,9 +70,6 @@ bool AudioSystem::Initialize()
 
 	mSystem->getLowLevelSystem(&mLowLevelSystem);
 
-	float dopplerScale = 1.0f;
-	float distanceFactor = 50.0f;
-	float rolloffScale = 1.0f;
 	mLowLevelSystem->set3DSettings(
 		dopplerScale,
 		distanceFactor,
@@ -211,27 +233,22 @@ FMOD::Studio::EventInstance* AudioSystem::GetEventInstance(unsigned int id)
 	return event;
 }
 
-namespace
-{
-	FMOD_VECTOR VecToFMOD(const Vector3& in)
-	{
-		FMOD_VECTOR v;
-		v.x = in.y;
-		v.y = in.z;
-		v.z = in.x;
-		return v;
-	}
-}
-
-void AudioSystem::SetListener(const Matrix4& viewMatrix)
+void AudioSystem::SetListener(const Matrix4& viewMatrix, float deltaTime)
 {
 	Matrix4 inView = viewMatrix;
+	Vector3 velocity;
 	inView.Invert();
+
+
 	FMOD_3D_ATTRIBUTES listener;
 	listener.position = VecToFMOD(inView.GetTranslation());
 	listener.forward = VecToFMOD(inView.GetZAxis());
 	listener.up = VecToFMOD(inView.GetYAxis());
-	listener.velocity = { 0.0f, 0.0f, 0.0f };
+	if (deltaTime > 0.0f)
+	{
+		velocity = CalVelocity(inView.GetTranslation(), mLastListenerPos, deltaTime);
+	}
+	listener.velocity = VecToFMOD(velocity);
 	mSystem->setListenerAttributes(0, &listener);
 }
 

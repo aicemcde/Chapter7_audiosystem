@@ -2,6 +2,18 @@
 #include "AudioSystem.h"
 #include <fmod_studio.hpp>
 
+namespace
+{
+	FMOD_VECTOR VecToFMOD(const Vector3& in)
+	{
+		FMOD_VECTOR v;
+		v.x = in.y;
+		v.y = in.z;
+		v.z = in.x;
+		return v;
+	}
+}
+
 SoundEvent::SoundEvent(AudioSystem* system, unsigned int id)
 	:mSystem(system)
 	,mID(id)
@@ -138,19 +150,7 @@ bool SoundEvent::Is3D() const
 	return retVal;
 }
 
-namespace
-{
-	FMOD_VECTOR VecToFMOD(const Vector3& in)
-	{
-		FMOD_VECTOR v;
-		v.x = in.y;
-		v.y = in.z;
-		v.z = in.x;
-		return v;
-	}
-}
-
-void SoundEvent::Set3DAttributes(const Matrix4& worldTrans)
+void SoundEvent::Set3DAttributes(const Matrix4& worldTrans, const Vector3& velocity)
 {
 	auto event = mSystem ? mSystem->GetEventInstance(mID) : nullptr;
 	if (event)
@@ -159,7 +159,7 @@ void SoundEvent::Set3DAttributes(const Matrix4& worldTrans)
 		attr.position = VecToFMOD(worldTrans.GetTranslation());
 		attr.forward = VecToFMOD(worldTrans.GetXAxis());
 		attr.up = VecToFMOD(worldTrans.GetZAxis());
-		attr.velocity = { 0.0f, 0.0f, 0.0f };
+		attr.velocity = VecToFMOD(velocity);
 		event->set3DAttributes(&attr);
 	}
 }
