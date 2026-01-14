@@ -32,11 +32,17 @@ namespace
 		result.z = (current.z - last.z) / deltaTime;
 		return result;
 	}
+
+	Vector3 LerpVector3(const Vector3& a, const Vector3& b, float f)
+	{
+		return a + f * (b - a);
+	}
 }
 
 AudioSystem::AudioSystem(Game* game)
 	:mGame(game)
 	,mLastListenerPos(Vector3::Zero)
+	,mLastListenerVelocity(Vector3::Zero)
 {
 	
 }
@@ -236,9 +242,7 @@ FMOD::Studio::EventInstance* AudioSystem::GetEventInstance(unsigned int id)
 void AudioSystem::SetListener(const Matrix4& viewMatrix, float deltaTime)
 {
 	Matrix4 inView = viewMatrix;
-	Vector3 velocity;
 	inView.Invert();
-
 
 	FMOD_3D_ATTRIBUTES listener;
 	listener.position = VecToFMOD(inView.GetTranslation());
@@ -246,9 +250,12 @@ void AudioSystem::SetListener(const Matrix4& viewMatrix, float deltaTime)
 	listener.up = VecToFMOD(inView.GetYAxis());
 	if (deltaTime > 0.0f)
 	{
-		velocity = CalVelocity(inView.GetTranslation(), mLastListenerPos, deltaTime);
+		Vector3 rawVelocity;
+		rawVelocity = CalVelocity(inView.GetTranslation(), mLastListenerPos, deltaTime);
+		mLastListenerVelocity = LerpVector3(mLastListenerVelocity, rawVelocity, 0.1f);
 	}
-	listener.velocity = VecToFMOD(velocity);
+	mLastListenerPos = inView.GetTranslation();
+	listener.velocity = VecToFMOD(mLastListenerVelocity);
 	mSystem->setListenerAttributes(0, &listener);
 }
 

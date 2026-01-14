@@ -3,6 +3,7 @@
 #include "AudioSystem.h"
 #include "Actor.h"
 #include <algorithm>
+#include <cmath>
 
 namespace
 {
@@ -14,12 +15,18 @@ namespace
 		result.z = (current.z - last.z) / deltaTime;
 		return result;
 	}
+
+	Vector3 LerpVector3(const Vector3& a, const Vector3& b, float f)
+	{
+		return a + f * (b - a);
+	}
 }
 
 
-AudioComponent::AudioComponent(Actor* actor, int updateOrder)
+AudioComponent::AudioComponent(Actor* actor, int updateOrder, const Vector3& pos)
 	:Component(actor, updateOrder)
-	, mLastPos(Vector3::Zero)
+	, mLastPos(pos)
+	,mLastVelocity(Vector3::Zero)
 {
 
 }
@@ -44,24 +51,25 @@ void AudioComponent::Update(float deltaTime)
 			return !e.IsValid();
 		}
 	);
-
 }
 
 void AudioComponent::OnUpdateWorldTransform(float deltaTime)
 {
 	Matrix4 world = mOwner->GetWorldTransform();
 	Vector3 currentPos = world.GetTranslation();
-	Vector3 velocity = Vector3::Zero;
 	if (deltaTime > 0)
 	{
-		velocity = CalVelocity(currentPos, mLastPos, deltaTime);
+		Vector3 rawVelocity;
+		rawVelocity = CalVelocity(currentPos, mLastPos, deltaTime);
+		//ノイズ軽減のため、線形補間
+		mLastVelocity = LerpVector3(mLastVelocity, rawVelocity, 0.1f);
 	}
 
 	for (auto& event : mEvent3D)
 	{
 		if (event.IsValid())
 		{
-			event.Set3DAttributes(world, velocity);
+			event.Set3DAttributes(world, mLastVelocity);
 		}
 	}
 

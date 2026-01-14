@@ -14,6 +14,7 @@
 #include "SpriteComponent.h"
 #include "AudioSystem.h"
 #include "AudioComponent.h"
+#include "MoveComponent.h"
 
 
 Game* Game::sInstance = nullptr;
@@ -171,6 +172,16 @@ void Game::UpdateGame()
 	{
 		deltaTime = 0.05f;
 	}
+
+	if (mFireSphere->GetPosition().x < 150.0f)
+	{
+		mSphereMoveComp->SetForwardSpeed(500.0f);
+	}
+	else if (mFireSphere->GetPosition().x > 850.0f)
+	{
+		mSphereMoveComp->SetForwardSpeed(-500.0f);
+	}
+
 	mScene->Update(deltaTime);
 	mAudioSystem->SetListener(mRenderer->GetView(), deltaTime);
 	mAudioSystem->Update(deltaTime);
@@ -260,12 +271,15 @@ void Game::LoadData()
 
 	//spheres with audio
 	a = mScene->CreateActor<Actor>(this);
+	mFireSphere = a;
 	a->SetPosition(Vector3(500.0f, -75.0f, 0.0f));
 	a->SetScale(1.0f);
 	mc = a->AddComponent_Pointer<MeshComponent>(a);
 	mc->SetMesh(mResourceManager->GetMesh("Assets/Sphere.gpmesh"));
-	AudioComponent* ac = a->AddComponent_Pointer<AudioComponent>(a);
+	AudioComponent* ac = a->AddComponent_Pointer<AudioComponent>(a, 200.0f, Vector3(500.0f, -75.0f, 0.0f));
 	ac->PlayEvent("event:/FireLoop");
+	mSphereMoveComp = a->AddComponent_Pointer<MoveComponent>(a);
+	mSphereMoveComp->SetForwardSpeed(0.0f);
 
 	//start music
 	mMusicEvent = mAudioSystem->PlayEvent("event:/Music");

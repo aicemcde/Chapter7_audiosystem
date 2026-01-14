@@ -46,6 +46,7 @@ private:
 	static unsigned int sNextID;
 	class Game* mGame;
 	Vector3 mLastListenerPos;
+	Vector3 mLastListenerVelocity;
 	FMOD::Studio::System* mSystem;
 	FMOD::System* mLowLevelSystem;
 	std::unordered_map < std::string, FMOD::Studio::Bank* > mBanks;

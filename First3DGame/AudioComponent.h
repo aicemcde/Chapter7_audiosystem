@@ -6,7 +6,7 @@
 class AudioComponent : public Component
 {
 public:
-	AudioComponent(class Actor* owner, int updateOrder = 200);
+	AudioComponent(class Actor* owner, int updateOrder = 200, const Vector3& pos = Vector3::Zero);
 	~AudioComponent();
 
 	void Update(float deltaTime) override;
@@ -16,6 +16,7 @@ public:
 	void StopAllEvent();
 private:
 	Vector3 mLastPos;
+	Vector3 mLastVelocity;
 	std::vector<SoundEvent> mEvent2D;
 	std::vector<SoundEvent> mEvent3D;
 };

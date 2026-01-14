@@ -52,4 +52,7 @@ private:
 	Uint32 mTicksCount;
 
 	Vector3 mRGB_bgColor;
+
+	class Actor* mFireSphere;
+	class MoveComponent* mSphereMoveComp;
 };
