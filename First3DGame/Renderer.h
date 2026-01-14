@@ -33,6 +33,7 @@ public:
 	void SetViewMatrix(const Matrix4& view) noexcept { mView = view; }
 	void SetAmbientLight(const Vector3& ambient) noexcept { mAmbientLight = ambient; }
 	DirectionalLight& GetDirectionalLight() noexcept { return mDirLight; }
+	Matrix4& GetView() noexcept { return mView; }
 private:
 	bool LoadShaders();
 	void CreateSpriteVerts();

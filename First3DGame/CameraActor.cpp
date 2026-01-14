@@ -34,7 +34,6 @@ void CameraActor::UpdateActor(float deltaTime)
 
 	Matrix4 view = Matrix4::CreateLookAt(cameraPos, target, up);
 	Game::GetRendererInstance()->SetViewMatrix(view);
-	mGame->GetAudioSystemInstance()->SetListener(view);
 }
 
 void CameraActor::ActorInput(const uint8_t* keys)
