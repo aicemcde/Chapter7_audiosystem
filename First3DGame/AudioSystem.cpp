@@ -9,6 +9,18 @@ const float REVERB_OCCLUSION = 1.0;
 
 unsigned int AudioSystem::sNextID = 0;
 
+namespace
+{
+	static FMOD_VECTOR VecToFMOD(const Vector3& in)
+	{
+		FMOD_VECTOR v;
+		v.x = in.y;
+		v.y = in.z;
+		v.z = in.x;
+		return v;
+	}
+}
+
 AudioSystem::AudioSystem(Game* game)
 	:mGame(game)
 {
@@ -47,10 +59,10 @@ bool AudioSystem::Initialize()
 	float dopplerScale = 1.0f;
 	float distanceFactor = 50.0f;
 	float rolloffScale = 1.0f;
-	mLowLevelSystem->get3DSettings(
-		&dopplerScale,
-		&distanceFactor,
-		&rolloffScale
+	mLowLevelSystem->set3DSettings(
+		dopplerScale,
+		distanceFactor,
+		rolloffScale
 	);
 
 	LoadBank("Assets/Master Bank.strings.bank");
@@ -61,7 +73,15 @@ bool AudioSystem::Initialize()
 
 void AudioSystem::Shutdown()
 {
+	for (auto& iter : mEventInstance)
+	{
+		iter.second->stop(FMOD_STUDIO_STOP_IMMEDIATE);
+		iter.second->release();
+	}
+	mEventInstance.clear();
+
 	UnloadAllBank();
+
 	if (mSystem)
 	{
 		mSystem->release();
@@ -192,6 +212,11 @@ SoundEvent AudioSystem::PlayEvent(const std::string& name)
 		event->getChannelGroup(&cg);
 		cg->set3DOcclusion(DIRECT_OCCLUSION, REVERB_OCCLUSION);
 	}
+
+	if (retID > 0)
+	{
+		return SoundEvent(this, retID);
+	}
 	return SoundEvent();
 }
 
@@ -204,18 +229,6 @@ FMOD::Studio::EventInstance* AudioSystem::GetEventInstance(unsigned int id)
 		event = iter->second;
 	}
 	return event;
-}
-
-namespace
-{
-	FMOD_VECTOR VecToFMOD(const Vector3& in)
-	{
-		FMOD_VECTOR v;
-		v.x = in.y;
-		v.y = in.z;
-		v.z = in.x;
-		return v;
-	}
 }
 
 void AudioSystem::SetListener(const Matrix4& viewMatrix)

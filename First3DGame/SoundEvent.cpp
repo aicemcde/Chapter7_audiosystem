@@ -138,18 +138,6 @@ bool SoundEvent::Is3D() const
 	return retVal;
 }
 
-namespace
-{
-	FMOD_VECTOR VecToFMOD(const Vector3& in)
-	{
-		FMOD_VECTOR v;
-		v.x = in.y;
-		v.y = in.z;
-		v.z = in.x;
-		return v;
-	}
-}
-
 void SoundEvent::Set3DAttributes(const Matrix4& worldTrans)
 {
 	auto event = mSystem ? mSystem->GetEventInstance(mID) : nullptr;

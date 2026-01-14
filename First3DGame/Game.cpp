@@ -140,6 +140,7 @@ void Game::HandleKeyPress(int key)
 		break;
 	case 'm':
 		mMusicEvent.SetPaused(!mMusicEvent.GetPaused());
+		break;
 	case 'r':
 		if (!mReverbSnap.IsValid())
 		{
