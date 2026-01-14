@@ -62,6 +62,19 @@ void AudioComponent::OnUpdateWorldTransform(float deltaTime)
 		Vector3 rawVelocity;
 		rawVelocity = CalVelocity(currentPos, mLastPos, deltaTime);
 		//ノイズ軽減のため、線形補間
+		/*
+		ノイズ（ジッター）の軽減
+		フレームレートが不安定な場合や、物理エンジンの座標更新と描画更新のタイミングのズレにより、計算される速度が毎フレーム激しく振動することがあります。音が「ビリビリ」震えて聞こえる原因になります。
+
+		対策: 厳密な精度が不要なら、前回の速度とブレンドして滑らかにする（スムージング）のが一般的です。
+
+		C++
+
+		// 簡易的なローパスフィルタ（スムージング）
+		Vector3 rawVelocity = CalVelocity(currentPos, mLastPos, deltaTime);
+		// 前回の速度を90%、今回の計算値を10%混ぜるなど
+		velocity = Lerp(velocity, rawVelocity, 0.1f);
+		*/
 		mLastVelocity = LerpVector3(mLastVelocity, rawVelocity, 0.1f);
 	}
 
